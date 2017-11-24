@@ -100,7 +100,7 @@ router.post('/register', upload.single('profileimage'), function(req, res, next)
 router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login',
                                                         failureFlash:"invalid username or password."}),function(req,res){
                 console.log("authentication successfull");
-                res.flash("success","you are logged in..");
+                res.flash("success","you are logged in!!");
                 res.redirect('/');
             });
 module.exports = router;
