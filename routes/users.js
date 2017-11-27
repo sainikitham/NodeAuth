@@ -40,18 +40,16 @@ router.post('/register', upload.single('profileimage'), function(req, res, next)
   // Check for profile image field
   if (req.file) {
     console.log('Uploading file...');
-    console.log(req.file);
     // Set profile picture file info
-    var profileImageOriginalName  = req.file.originalname;
-    var profileImageName          = req.file.originalname;
-    var profileImageMime          = req.file.mimetype;
-    var profileImagePath          = req.file.path;
-    var profileImageExt           = req.file.extension;
-    var profileImageSize          = req.file.size;
+    var profileImageOriginalName  = req.file.profileimage.originalname;
+    var profileImageName          = req.file.profileimage.name;
+    var profileImageMime          = req.file.profileimage.mimetype;
+    var profileImagePath          = req.file.profileimage.path;
+    var profileImageExt           = req.file.profileimage.extension;
+    var profileImageSize          = req.file.profileimage.size;
   } else {
     // Set a default image
     var profileImageName = 'noimage.png';
-    console.log(profileImageName);
   }
 
   // Express-validator form validation check
@@ -97,10 +95,48 @@ router.post('/register', upload.single('profileimage'), function(req, res, next)
   }
 });
 
-router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login',
-                                                        failureFlash:"invalid username or password."}),function(req,res){
-                console.log("authentication successfull");
-                res.flash("success","you are logged in!!");
-                res.redirect('/');
-            });
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.getUserById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+// Passport-local user authentication
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    // Validate submitted username
+    User.getUserByUsername(username, function(err, user) {
+      if (err) throw err;
+      if (!user) {
+        return done(null, false, { message: 'Invalid username.' });
+      }
+      // Validate submitted password
+      User.comparePassword(password, user.password, function(err, isMatch) {
+        if (err) throw err;
+        if (isMatch) {
+          return done(null, user);
+        } else {
+          return done(null, false, { message: 'Invalid password.' });
+        }
+      });
+    });
+  }
+));
+
+router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: 'Invalid username or password.' }), function(req, res) {
+  // If authentication is successful
+  req.flash('success', 'You are now logged in.');
+  res.redirect('/');
+});
+
+router.get('/logout', function(req, res) {
+  req.logout();
+  req.flash('success', 'You are now logged out.');
+  res.redirect('/users/login');
+});
+
 module.exports = router;

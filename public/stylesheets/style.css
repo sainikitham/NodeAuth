@@ -5,3 +5,12 @@ body {
   padding: 40px 15px !important;
   text-align: center !important;
 }
+ul.success li{
+  padding: 15px;
+    list-style: none;
+    background: lightgreen;
+    width: 50%;
+    margin-top: 15px;
+    font-size: medium;
+    border-radius: 10px;
+}
