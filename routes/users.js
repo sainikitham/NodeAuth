@@ -107,20 +107,24 @@ passport.deserializeUser(function(id, done) {
 
 // Passport-local user authentication
 passport.use(new LocalStrategy(
-  function(username, password, done) {
-    // Validate submitted username
-    User.getUserByUsername(username, function(err, user) {
-      if (err) throw err;
-      if (!user) {
-        return done(null, false, { message: 'Invalid username.' });
+  function(username,password,done){
+    User.getUserByUsername(username,function(err,user){
+      if (err) {
+        throw err;
       }
-      // Validate submitted password
-      User.comparePassword(password, user.password, function(err, isMatch) {
-        if (err) throw err;
+      if (!user) {
+        console.log("unknown user");
+        return done(null,false, {message:"unknown user"});
+      }
+      User.comparePassword(password,user.password,function(err,isMatch){
+        if (err) {
+          throw err;
+        }
         if (isMatch) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: 'Invalid password.' });
+          return done(null,user);
+        }else{
+          console.log("invalid password");
+          return done(null,false, {message:"invalid password"});
         }
       });
     });

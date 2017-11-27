@@ -14,3 +14,12 @@ ul.success li{
     font-size: medium;
     border-radius: 10px;
 }
+ul.error li{
+  padding: 15px;
+    list-style: none;
+    background: #E80000;
+    width: 50%;
+    margin-top: 15px;
+    font-size: medium;
+    border-radius: 10px;
+}
